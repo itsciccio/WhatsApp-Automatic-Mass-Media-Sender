@@ -5,17 +5,19 @@ import time
 
 class WhatsApp_Handler:
 
-    def __init__(self, file_path, text_to_send):
+    def __init__(self, promoter_file_path, file_path, text_to_send, debug_toggle):
+        self.promoter_file_path = promoter_file_path
         self.file_path = file_path
         self.text_to_send = text_to_send
+        self.debug_toggle = debug_toggle
 
         if(self.file_path==None or self.text_to_send==""):
             raise Exception("Please upload an image and set the text message.")
             exit()
 
-        csv_reader = CSV_Reader("promoters.csv")
+        csv_reader = CSV_Reader(self.promoter_file_path)
         self.promoter_names = csv_reader.extract_names()
-        self.promoter_names = ['']
+        self.debug = False
 
         self.driver = webdriver.Chrome()
         self.driver.get('https://web.whatsapp.com/')
@@ -23,7 +25,8 @@ class WhatsApp_Handler:
 
         input('Wait for QR Code... [Press Enter]')
 
-    def run_whatsapp_service(self):
+    def run_whatsapp_service(self, debug_toggle=False):
+
         for name in self.promoter_names:
 
             self.search_for_contact(name)
@@ -37,7 +40,9 @@ class WhatsApp_Handler:
                 
                 continue
             else:
-                self.send_msg_to_contact(name)
+                self.send_msg_to_contact(name, debug_toggle)
+        
+        if debug_toggle: print("Debug test success!")
 
     def search_for_contact(self, name):
         new_message_button = self.driver.find_element_by_xpath('//div[@role="button" and @title="New chat"]')
@@ -56,9 +61,11 @@ class WhatsApp_Handler:
         back_button = self.driver.find_element_by_xpath('//button[@aria-label="Back"]')
         back_button.click()
 
-    def send_msg_to_contact(self, name):
+    def send_msg_to_contact(self, name, debug=False):
         contact_found = self.driver.find_element_by_xpath('//span[contains(@title, "{}")]'.format(name))
         contact_found.click()
+        
+        if debug: return
 
         text_box = self.driver.find_element_by_xpath('//div[@role="textbox" and @data-tab="9"]')
         text_box.send_keys(self.text_to_send)

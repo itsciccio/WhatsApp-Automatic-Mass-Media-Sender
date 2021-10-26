@@ -1,0 +1,7 @@
+1) image preview 
+2) text message preview
+3) add nicknames/shorthand for promoters, and randomize salutation. "Hey ann xx isma" or "eyyy ju mela .."
+4) split up message into different messages (each sentence, 1 msg)
+5) automatic updating of contacts using sheet
+6) dialog box after qr code to begin sending
+7) clean the dialog box handler script
