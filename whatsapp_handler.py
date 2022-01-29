@@ -1,33 +1,44 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from csv_reader import CSV_Reader
+from confirm_window import Confirm_Window
 import time
+import copy
+import random
 
 class WhatsApp_Handler:
 
-    def __init__(self, promoter_file_path, file_path, text_to_send, debug_toggle):
+    def __init__(self, promoter_file_path, file_path, text_to_send, cue_toggle, debug_toggle):
         self.promoter_file_path = promoter_file_path
         self.file_path = file_path
         self.text_to_send = text_to_send
+        self.cue_toggle = cue_toggle
         self.debug_toggle = debug_toggle
 
-        if(self.file_path==None or self.text_to_send==""):
-            raise Exception("Please upload an image and set the text message.")
+        if(self.file_path==None and self.text_to_send=="" and self.debug_toggle==False):
+            raise Exception("Please upload an image and/or set the text message.")
             exit()
 
-        csv_reader = CSV_Reader(self.promoter_file_path)
-        self.promoter_names = csv_reader.extract_names()
-        self.debug = False
+        if(self.promoter_file_path==None or self.promoter_file_path==''):
+            self.promoter_details = {'Marika Borg Bonello':{'Mobile Number':'99897851','Nickname':'ma'}}
+            print("WARNING: Using hard-coded data: "+ str(self.promoter_details))
+        else:
+            csv_reader = CSV_Reader(self.promoter_file_path)
+            self.promoter_details = csv_reader.extract_details()        
 
         self.driver = webdriver.Chrome()
         self.driver.get('https://web.whatsapp.com/')
-        self.driver.implicitly_wait(2)   
+        self.driver.implicitly_wait(2)  
 
-        input('Wait for QR Code... [Press Enter]')
+    def run_whatsapp_service(self):
 
-    def run_whatsapp_service(self, debug_toggle=False):
+        confirm_window = Confirm_Window(self.promoter_file_path, self.file_path, self.text_to_send, self.cue_toggle, self.debug_toggle)
 
-        for name in self.promoter_names:
+        if(not confirm_window.run_window()):
+            print("User cancelled program.")
+            exit()
+
+        for name, items in self.promoter_details.items():
 
             self.search_for_contact(name)
             
@@ -40,9 +51,9 @@ class WhatsApp_Handler:
                 
                 continue
             else:
-                self.send_msg_to_contact(name, debug_toggle)
+                self.send_msg_to_contact(name, items['Nickname'])
         
-        if debug_toggle: print("Debug test success!")
+        if self.debug_toggle: print("Debug test success!")
 
     def search_for_contact(self, name):
         new_message_button = self.driver.find_element_by_xpath('//div[@role="button" and @title="New chat"]')
@@ -61,21 +72,43 @@ class WhatsApp_Handler:
         back_button = self.driver.find_element_by_xpath('//button[@aria-label="Back"]')
         back_button.click()
 
-    def send_msg_to_contact(self, name, debug=False):
+    def send_msg_to_contact(self, name, nickname):
         contact_found = self.driver.find_element_by_xpath('//span[contains(@title, "{}")]'.format(name))
-        contact_found.click()
+        contact_found.click()        
+
+        list_texts = copy.deepcopy(self.text_to_send)
+
+        if self.cue_toggle:
+            intro_cue = self.personalize_texts(nickname)            
+            list_texts.insert(0,intro_cue)
         
-        if debug: return
+        if self.debug_toggle: return
 
-        text_box = self.driver.find_element_by_xpath('//div[@role="textbox" and @data-tab="9"]')
-        text_box.send_keys(self.text_to_send)
-        text_box.send_keys(Keys.ENTER)
+        if self.text_to_send!="":
+            for text in list_texts:
+                text_box = self.driver.find_element_by_xpath('//div[@role="textbox" and @data-tab="10"]')
+                text_box.send_keys(text)
+                text_box.send_keys(Keys.ENTER)
+        if self.file_path!=None:
+            attach_button = self.driver.find_element_by_xpath('//div[@role="button" and @title="Attach"]')
+            attach_button.click()
 
-        attach_button = self.driver.find_element_by_xpath('//div[@role="button" and @title="Attach"]')
-        attach_button.click()
+            # self.driver.find_element_by_css_selector('input[accept="*"]').send_keys(self.file_path)
+            self.driver.find_element_by_css_selector('input[accept="image/*,video/mp4,video/3gpp,video/quicktime"]').send_keys(self.file_path)            
 
-        self.driver.find_element_by_css_selector('input[type="file"]').send_keys(self.file_path)
+            send_image = self.driver.find_element_by_xpath('//span[@data-testid="send"]')
+            send_image.click()
 
-        send_image = self.driver.find_element_by_xpath('//span[@data-testid="send"]')
-        send_image.click()
+    def personalize_texts(self, nickname):
+        cue = ["heyy", "aw", "aww"]
+        xs = ["xx", "x"]
+        post_x = ["","isma"]
+        intro = random.choice(cue)+" "+nickname+" "+random.choice(xs)+" "+random.choice(post_x)
 
+        return intro
+
+# reminder ur on guest list tonight, say ur name at the door and ur sorted x
+# issa if anyone yk needs tickets, tell them to rev me 12e on this number u nzidhom fuq guest list as well dw
+# last but not least try take pics/vids for story and send me ur best shots so ill use for future promo 
+# thanks so so much for your help with this event... hope you enjoy tn xx
+# need anything else, hmu x
