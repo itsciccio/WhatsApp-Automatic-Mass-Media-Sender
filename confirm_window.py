@@ -68,9 +68,12 @@ class Confirm_Window:
         text_preview = "\n".join(text_prev)        
         self.text_message_text = Label(self.window, text = text_preview)
 
-        if self.file_path != None and "MP4" not in self.file_path:
+        if self.file_path != None:
             self.image_preview_text = Label(self.window, text = 'Image Preview:')        
-            self.image = ImageTk.PhotoImage(Image.open(self.file_path).resize((200,200), Image.ANTIALIAS))
+            if ".mp4" not in self.file_path:
+                self.image = ImageTk.PhotoImage(Image.open(self.file_path).resize((200,200), Image.ANTIALIAS))
+            else:
+                self.image = ImageTk.PhotoImage(Image.open('220px-Kermit_the_Frog.jpg').resize((400,200), Image.ANTIALIAS))
             self.image_preview = Label(self.window, image = self.image)
 
         self.is_debug_text_title = Label(self.window, text = 'Debug Mode:')
