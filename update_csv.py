@@ -2,9 +2,7 @@ from codecs import ignore_errors
 import requests
 import pandas as pd
 
-sheet_url = ( 
-    'https://docs.google.com/spreadsheet/ccc?key=1NukWXy_7bEVDMMeTO1MY15RALyYG2ONzjaTgifUDKAg&output=csv'
-)
+sheet_url = open('local/sheet_url.txt').readline()
 response = requests.get(sheet_url)
 
 retrieved_data = response.content.decode('utf-8').replace('\r','').split('\n')
