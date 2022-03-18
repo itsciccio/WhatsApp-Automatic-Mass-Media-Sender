@@ -16,9 +16,15 @@ class CSV_Reader:
         promoter_names = [self.clean_name(name) for name in list(self.df['Name'])]       
         promoter_nicknames = list(self.df['Nickname'])     
         promoter_numbers= list(self.df['Mobile Number'])
+        promoter_genders= list(self.df['Gender'])
 
-        for (name, nickname, phone_number) in zip(promoter_names, promoter_nicknames, promoter_numbers):
-            promoter_details[str(name)] = {"Nickname" : str(nickname), "Mobile Number": str(phone_number)}
+        for (name, nickname, phone_number, gender) in zip(
+            promoter_names, promoter_nicknames, promoter_numbers, promoter_genders):
+            promoter_details[str(name)] = {
+                "Nickname" : str(nickname), 
+                "Mobile Number": str(phone_number),
+                "Gender": str(gender)
+                }
 
         return promoter_details
 

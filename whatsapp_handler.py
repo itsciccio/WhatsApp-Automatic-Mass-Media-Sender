@@ -1,3 +1,4 @@
+import json
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from csv_reader import CSV_Reader
@@ -20,7 +21,8 @@ class WhatsApp_Handler:
             exit()
 
         if(self.promoter_file_path==None or self.promoter_file_path==''):
-            self.promoter_details = {'Marika Borg Bonello':{'Mobile Number':'99897851','Nickname':'ma'}}
+            test_promoter = json.load(open('debug/test_user.json'))     
+            self.promoter_details = test_promoter
             print("WARNING: Using hard-coded data: "+ str(self.promoter_details))
         else:
             csv_reader = CSV_Reader(self.promoter_file_path)
@@ -51,7 +53,7 @@ class WhatsApp_Handler:
                 
                 continue
             else:
-                self.send_msg_to_contact(name, items['Nickname'])
+                self.send_msg_to_contact(name, items['Nickname'], items['Gender'])
         
         if self.debug_toggle: print("Debug test success!")
 
@@ -72,14 +74,14 @@ class WhatsApp_Handler:
         back_button = self.driver.find_element_by_xpath('//button[@aria-label="Back"]')
         back_button.click()
 
-    def send_msg_to_contact(self, name, nickname):
+    def send_msg_to_contact(self, name, nickname, gender):
         contact_found = self.driver.find_element_by_xpath('//span[contains(@title, "{}")]'.format(name))
         contact_found.click()        
 
         list_texts = copy.deepcopy(self.text_to_send)
 
         if self.cue_toggle:
-            intro_cue = self.personalize_texts(nickname)            
+            intro_cue = self.personalize_texts(nickname, gender)            
             list_texts.insert(0,intro_cue)
         
         if self.debug_toggle: return
@@ -99,16 +101,15 @@ class WhatsApp_Handler:
             send_image = self.driver.find_element_by_xpath('//span[@data-testid="send"]')
             send_image.click()
 
-    def personalize_texts(self, nickname):
-        cue = ["heyy", "aw", "aww"]
-        xs = ["xx", "x"]
-        post_x = ["","isma"]
-        intro = random.choice(cue)+" "+nickname+" "+random.choice(xs)+" "+random.choice(post_x)
+    def personalize_texts(self, nickname, gender):
+        greeting = ["heyy", "oyy", "aww"]
+        xs = ["xxx", "xx", "x"]
+        post_x = ["", "isma", "xanna"]
 
+        if gender == 'F':
+            intro = random.choice(greeting)+" "+nickname+" "+random.choice(xs)+" "+random.choice(post_x)
+        else:
+            intro = random.choice(greeting)+" "+nickname+" "+random.choice(post_x)
+        
+        print(intro)
         return intro
-
-# reminder ur on guest list tonight, say ur name at the door and ur sorted x
-# issa if anyone yk needs tickets, tell them to rev me 12e on this number u nzidhom fuq guest list as well dw
-# last but not least try take pics/vids for story and send me ur best shots so ill use for future promo 
-# thanks so so much for your help with this event... hope you enjoy tn xx
-# need anything else, hmu x

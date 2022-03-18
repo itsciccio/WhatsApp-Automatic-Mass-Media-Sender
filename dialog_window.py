@@ -14,7 +14,7 @@ class Dialog_Window:
     def setup_dialog_box(self):
         self.window = Tk()
         self.window.title('Promoter Media Upload')        
-        self.window.geometry("600x350")        
+        self.window.geometry("800x350")        
         self.window.config(background = "white")
 
         self.button_prompt_text_label_promoters = Label(self.window, text = 'Upload promoter .csv file:')
@@ -93,7 +93,7 @@ class Dialog_Window:
         text_to_prevew = [line for line in processed_text if line!=""]
 
         if int(self.cue_toggle.get()) == 1:
-            text_to_prevew.insert(0, "[cue] [name] [xs]")        
+            text_to_prevew.insert(0, "[cue] [name] [?xs] [post x]")        
                 
         text_to_prevew.insert(0, "Text message preview:")
 

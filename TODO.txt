@@ -2,7 +2,7 @@
 [DONE] - 2) text message preview
 [DONE] - 3) add nicknames/shorthand for promoters, and randomize salutation. "Hey ann xx isma" or "eyyy ju mela .."
 [DONE] - 4) split up message into different messages (each sentence, 1 msg)
-5) automatic updating of contacts using sheet
+[DONE] 5) automatic updating of contacts using sheet
 [DONE] - 6) dialog box after qr code to begin sending (show image preview)
 7) clean the dialog box handler script
 
@@ -11,3 +11,6 @@ extras
 2) emoji support
 3) ability to send multiple media files
 4) multiple csv files
+
+
+male/female support
